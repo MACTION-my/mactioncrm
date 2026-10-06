@@ -1,0 +1,1 @@
+export const firebaseConfig=Object.freeze({apiKey:'AIzaSyD7s_0g0BrZg4v84BXSNbAfdnF5w6LS11A',authDomain:'maction-crm.firebaseapp.com',projectId:'maction-crm',storageBucket:'maction-crm.firebasestorage.app',messagingSenderId:'849271461921',appId:'1:849271461921:web:c90bdbcf8d47a238e16b60'});

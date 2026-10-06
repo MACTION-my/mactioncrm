@@ -1,0 +1,7 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Bootstrap protection. No access until real authentication and ACL are integrated.
+    match /{document=**} { allow read, write: if false; }
+  }
+}
