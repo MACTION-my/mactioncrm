@@ -2,7 +2,7 @@ const permissionEventRoot=typeof window!=='undefined'?window:document;
 // Local role preview only. Production authorization must be enforced by Firebase, not this UI.
 const staffSeed=[{id:'boss',name:'老板',role:'老板'},{id:'account',name:'Account',role:'Account'},{id:'manager',name:'经理',role:'经理'},{id:'amanda',name:'Amanda',role:'团队'},{id:'jason',name:'Jason',role:'团队'}];
 let access;try{access=JSON.parse(localStorage.getItem('maction-access-demo'))}catch{}access??={users:staffSeed,assignments:[],logs:[]};let currentStaff=access.users[0],fullDb=db;
-const admin=()=>['老板','Account'].includes(currentStaff.role),canAssign=()=>admin()||currentStaff.role==='经理',canData=()=>admin();
+const admin=()=>['老板','Account'].includes(currentStaff.role),canAssign=()=>admin()||(currentStaff.role==='经理'&&(typeof allowedRoleOption!=='function'||allowedRoleOption('assign'))),canData=()=>admin();
 function storeAccess(){localStorage.setItem('maction-access-demo',JSON.stringify(access))}
 function assignedClient(id){return access.assignments.some(a=>a.user===currentStaff.id&&a.kind==='client'&&a.target===id)}
 function assignedOrder(o){return assignedClient(o.client)||access.assignments.some(a=>a.user===currentStaff.id&&a.kind==='order'&&a.target===o.id)}
