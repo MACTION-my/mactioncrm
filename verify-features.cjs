@@ -29,3 +29,5 @@ assert.equal(run("learnerBy('schedule-individual').event"),'ev1');
 run("enrollmentList('', 'schedule-event')");
 assert(el('#dialog-content').innerHTML.includes('Schedule Shared'));
 console.log('PASS: company course scheduling updates activity roster while preserving attended learner history');
+
+run("db.orders.push({...db.orders[0],id:'pending-roster',event:'schedule-event',nextEvent:''});enrollmentList('', 'schedule-event')");assert(el('#dialog-content').innerHTML.includes('pending-roster'));assert(el('#dialog-content').innerHTML.includes('补充本场学员'));assert.equal(run("missingEventRosters('schedule-event').some(o=>o.id==='pending-roster')"),true);console.log('PASS: scheduled orders without learners remain visible in event roster with direct enrollment action');
