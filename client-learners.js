@@ -1,0 +1,43 @@
+// Register several learners alongside a customer, with independent learner records.
+const beforeClientLearnersForm=clientForm;
+clientForm=function(id){
+  beforeClientLearnersForm(id);
+  const form=document.querySelector('#client-form'),section=document.createElement('section');
+  section.className='client-learner-section';
+  section.innerHTML='<div class="form-section">学员资料</div><p>每位学员独立登记。可先保存资料，之后关联课程订单与活动。</p><div id="client-learner-rows"></div><button type="button" class="button primary" data-client-learner-add>＋ 学员资料</button>';
+  form.querySelector('.modal-body').append(section);
+  let sequence=0;
+  const appendLearner=(l={})=>{
+    const n=sequence++,row=document.createElement('section');row.className='panel';row.style.margin='16px 0';row.style.padding='18px';
+    const prefix='learner:'+n+':';
+    row.innerHTML=`<h3>学员 ${n+1}</h3><input type="hidden" name="${prefix}id" value="${esc(l.id||'')}"><div class="form-grid">${[['name','学员姓名','text',true],['ic','IC No.','text',false],['phone','电话','tel',false],['email','Email','email',false],['position','职位','text',false]].map(([key,label,type,required])=>`<div class="field"><label for="client-learner-${n}-${key}">${label}</label><input id="client-learner-${n}-${key}" name="${prefix+key}" type="${type}" value="${esc(l[key]||'')}" ${required?'required':''}></div>`).join('')}<div class="field"><label for="client-learner-${n}-order">关联课程订单</label><select id="client-learner-${n}-order" name="${prefix}order"><option value="">稍后安排</option>${db.orders.filter(o=>o.client===id&&!productIsService(product(o.product))).map(o=>`<option value="${esc(o.id)}" ${l.order===o.id?'selected':''}>${esc(o.id+' · '+product(o.product).name)}</option>`).join('')}</select></div></div>${l.id?'<p>已有学员记录，保存会更新资料。</p>':'<button type="button" class="button small" data-remove-draft-learner>移除这组未保存资料</button>'}`;
+    row.querySelector('[data-remove-draft-learner]')?.addEventListener('click',()=>row.remove());
+    section.querySelector('#client-learner-rows').append(row);
+  };
+  section.querySelector('[data-client-learner-add]').addEventListener('click',()=>appendLearner());
+  if(id)db.learners.filter(l=>l.client===id).forEach(appendLearner);
+};
+function saveClientWithLearners(values,existingId){
+  const customer={},rows=new Map();
+  for(const [key,value] of values){const match=key.match(/^learner:(\d+):(\w+)$/);if(match){if(!rows.has(match[1]))rows.set(match[1],{});rows.get(match[1])[match[2]]=String(value).trim()}else customer[key]=value}
+  if(!String(customer.name||'').trim()||!String(customer.phone||'').trim())throw Error('请填写客户姓名和电话');
+  if(customer.invoice==='公司'&&!String(customer.company||'').trim())throw Error('请填写公司名称');
+  const id=existingId||crypto.randomUUID(),existing=existingId?client(existingId):null;
+  if(existingId&&!existing)throw Error('客户记录不存在');
+  for(const l of rows.values()){
+    if(!l.name)throw Error('请填写每位学员姓名，或移除未填写的资料组');
+    if(l.id&&!db.learners.some(x=>x.id===l.id&&x.client===id))throw Error('学员不属于此客户');
+    if(l.order&&!db.orders.some(o=>o.id===l.order&&o.client===id&&!productIsService(product(o.product))))throw Error('请选择属于此客户的课程订单');
+  }
+  customer.invoice??=existing?.invoice||'个人';customer.hrdc??=existing?.hrdc||'NO';
+  customer.company=String(customer.company||'').trim()||'个人客户';
+  if(existing)Object.assign(existing,customer);else db.clients.push({...customer,id});
+  for(const l of rows.values()){if(l.id)Object.assign(learnerBy(l.id),l);else db.learners.push({...l,id:crypto.randomUUID(),client:id,event:'',nextEvent:'',status:'还没上课',serviceStatus:'暂无后续服务'})}
+  return id;
+}
+permissionEventRoot.addEventListener('submit',e=>{
+  if(e.target.id!=='client-form')return;
+  e.preventDefault();e.stopImmediatePropagation();
+  if(currentStaff.role==='团队')return toast('当前角色不能新增或编辑客户');
+  try{saveClientWithLearners(Array.from(new FormData(e.target)),e.target.dataset.id);save();$('#dialog').close();render();toast('客户与学员资料已一起保存')}catch(err){toast(err.message)}
+},true);
