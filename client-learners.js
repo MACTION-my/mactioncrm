@@ -34,6 +34,7 @@ function saveClientWithLearners(values,existingId){
     const old=l.id?learnerBy(l.id):null;const order=l.order?db.orders.find(o=>o.id===l.order):null;if(order&&old&&[old.event,old.nextEvent].some(event=>event&&!eventMatchesProduct(eventBy(event),order.product)))throw Error('学员 '+l.name+' 已有场次与新订单产品不符，请先在学员安排中改场次');
     if(l.order&&!db.orders.some(o=>o.id===l.order&&o.client===id&&!productIsService(product(o.product))))throw Error('请选择属于此客户的课程订单');
   }
+  if(customer.vip!==undefined)customer.vip=customer.vip==='YES';
   customer.invoice??=existing?.invoice||'个人';customer.hrdc??=existing?.hrdc||'NO';
   customer.company=String(customer.company||'').trim()||'个人客户';
   if(existing)Object.assign(existing,customer);else db.clients.push({...customer,id});
