@@ -1,0 +1,5 @@
+// Display formatting only: keep ISO values for native date inputs, storage and comparisons.
+function displayDateText(value){return String(value).replace(/\b(\d{4})-(\d{2})-(\d{2})(?!\d)/g,'$3-$2-$1').replace(/\b(\d{4})\/(\d{1,2})\/(\d{1,2})(?!\d)/g,(_,y,m,d)=>d.padStart(2,'0')+'-'+m.padStart(2,'0')+'-'+y)}
+function formatVisibleDates(root){if(!root)return;if(root.nodeType===3){const parent=root.parentElement;if(!parent||parent.closest('script,style,textarea,input,[contenteditable]'))return;const formatted=displayDateText(root.nodeValue);if(formatted!==root.nodeValue)root.nodeValue=formatted;return}if(root.nodeType!==1&&root.nodeType!==9)return;if(root.nodeType===1&&root.matches('script,style,textarea,input,[contenteditable]'))return;for(const child of [...root.childNodes])formatVisibleDates(child)}
+formatVisibleDates(document.body);
+new MutationObserver(records=>{for(const record of records){if(record.type==='characterData')formatVisibleDates(record.target);else for(const node of record.addedNodes)formatVisibleDates(node)}}).observe(document.body,{subtree:true,childList:true,characterData:true});
