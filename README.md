@@ -1,19 +1,17 @@
-# MACTION CRM 预览版
+# MACTION CRM — 正式环境
 
-运行 `npm run dev`，打开 http://127.0.0.1:4173 。无需安装依赖，无登录。
+入口：https://maction-crm.web.app/ ，GitHub Pages 自定义域名：https://www.mustaction.my/ 。
 
-目前是本地交互预览，使用示例客户资料，数据仅保存到当前浏览器 localStorage。可新增/编辑客户、新增订单、登记分次付款、搜索筛选、记录联系并完成跟进。
+正式版使用 Firebase Authentication、App Check 和新加坡 Cloud Functions。客户与业务资料保存于 Firestore，每次写入由服务器检查员工状态、角色、客户／订单分配及修改前版本；更新与审计在同一事务中提交。浏览器不保存 CRM 业务资料，不迁移旧 Demo 数据。
 
-活动与场次可新增和编辑课程日期范围、每天开始/结束时间、地点、老师，并关联产品。客户联系记录可关联邀约的活动。学员独立关联客户、活动和订单，可更新上课状态，多次增加跟进和后续服务记录。服务记录保留独立进度，尚有未完成服务时显示进行中。暂未实现证书管理。
+老板账号：marketing@maction.com.my。老板及 Account 在「权限与分配 → 添加员工」填写姓名、Email、至少12位密码及角色，即可创建 Firebase 登录账号。密码仅传给账号创建接口，不保存于 Firestore、GitHub 或审计日志。公开自助注册已关闭。员工停用会拒绝后台访问并停用 Firebase 账号。
 
-导入导出：客户名单支持 UTF-8 CSV 模板、导入预览及确认（重复 ID 跳过，不覆盖）；各业务记录支持 CSV 导出；完整 JSON 备份恢复会检查关联和金额，需用户确认替换。CSV 导出防止表格公式注入。客户导入 CSV 不接受业务表导入；业务记录通过完整 JSON 恢复。
+团队只读取已分配的客户／课程订单。服务订单必须明确分配。经理／团队不能登记收款或删除客户；经理可以转交客户，但停用员工账号仅限老板／Account。日志由服务器记录，客户端不能修改。列表、保存状态与每分钟更新读取的是云端资料。
 
-客户表单包含 Full Name、IC No.、Phone No.、Email、Position、Company Name、Company Register No.、Company Address、Company TIN No.、Company SST No.、Invoice 个人/公司及 HRDC Claim YES/NO。
+Firestore 和 Storage 客户端规则拒绝所有直接读写。附件尚未启用。客户资料不属于公开网站内容，未登录只显示登录页。按用户要求不启用 MFA 或敏感操作二次确认。
 
-尚未连接 GitHub 远程仓库、Firestore、文件上传或登录；不会生成真实发票，也不会提交 HRDC 申请。接入后台时应将浏览器储存替换为 Firestore 数据层，并实现 Firebase Authentication、数据库访问规则、服务端收款事务、附件 Storage 与操作日志。无登录预览仅供测试资料使用。
+验证：`node verify.cjs`、`node verify-features.cjs`、`node verify-production.cjs`、`node functions/policy.test.cjs`。后台真实测试已验证账号创建、云端事务、冲突拒绝、App Check、直接数据库访问拒绝、团队／服务隔离、收款限制及停用账号。测试资料、账号和 App Check debug token已删除。
 
-`node --check app.js` 和 `node --check features.js` 检查 JavaScript 语法；`node verify.cjs` 与 `node verify-features.cjs` 验证收款、活动、学员记录及导入检查。如果系统 npm 不可用，可直接使用 `node server.cjs` 启动。
-`n新版导航：产品目录支持新增编辑课程与服务产品；课程管理按客户订单查看收款、上课状态、实际参加日期、本次场次、下一期和后续备注；课程活动管理场次；服务管理按签约订单记录阶段、0–100%进度、满意度及多次进展历史。新增订单客户选择支持搜索公司、姓名、电话、Email，必须选择搜索结果才能提交。
-课程活动现支持多选关联课程产品，兼容旧版单产品记录；多推广产品的订单可安排同一场次，备份验证支持该关联。侧栏按总览、客户与销售、客户交付、产品与活动、资料工具分组。各页增加选项筛选及重置；Dashboard按销售负责人汇总，其他页筛选当前页面显示记录，导入导出页按资料类别筛选工具。
-红底金色 Logo 登录页为账号选择的设计预览，不收集密码、不做真实身份验证。操作审计记录本机新增/修改/删除的字段与前后值，分配及权限修改也记录；老板与Account可查看。经理及团队禁止删除客户。正式上线前必须接入Firebase Authentication，并在服务端产生不可由客户端修改的登录和操作日志，前端角色模拟不是安全边界。
-新增客户成长与成果模块：客户行业/规模/分店/经营问题/目标；开票资料与课程学员名单完整度；学员出席及改期历史；服务里程碑、负责人、截止日期、证据和客户确认；课后行动及成果回访；再次购买机会与阶段；Dashboard异常提醒。新资料纳入现有JSON备份及字段审计，团队沿用客户/服务分配范围。里程碑证据目前记录文本或链接，尚未上传文件。异常提醒是页面动态检查，尚未发送外部通知。
+部署：`node build-hosting.cjs`，然后使用 Firebase CLI 部署 hosting/functions/rules。Node.js 22 为后台运行版本。后台依赖锁定于 functions/package-lock.json；2026-10-09 安全依赖审计为0个已知漏洞。
+
+限制：单次保存最多150条记录，较大历史导入需分批；日志页面显示最近200条登录和500条审计，较早记录继续保存在服务器。当前 API 每次加载会读取业务集合，数据量增大时需改为分页／按需查询。每日备份保留7天，PITR保留7天；已配置恢复能力但尚未进行完整恢复演练。Google Cloud按实际使用收取费用。

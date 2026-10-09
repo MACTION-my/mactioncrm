@@ -1,7 +1,8 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Bootstrap protection. No access until real authentication and ACL are integrated.
+    // Production: only the authenticated, App-Check-protected backend uses Admin SDK.
+    // Every direct browser read/write remains denied, including audit and role documents.
     match /{document=**} { allow read, write: if false; }
   }
 }

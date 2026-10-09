@@ -5,3 +5,5 @@ hosting-public/
 .firebase/
 *.log
 .pnpm-store/
+
+ops/

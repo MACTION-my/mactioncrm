@@ -1,14 +1,15 @@
-# Security status
+# 正式安全状态（2026-10-09）
 
-Implemented locally: loopback-only preview server, public asset allowlist (prevents exposing configs, tests and secrets), no-cache, anti-framing, MIME-sniffing and browser resource restrictions. Firestore/Storage deny-all bootstrap rules are prepared but not deployed.
+已部署：真实 Firebase 登录、关闭自助注册、邮箱枚举保护、App Check 强制校验、服务器角色及员工停用检查、每用户每分钟120次接口限流、事务式更新和不可由客户端更改的审计、版本冲突保护、团队和服务订单隔离、收款与客户删除权限限制、输出转义、CSV公式防护、CSP/防框架/MIME保护、数据库和附件直接访问拒绝。
 
-Not yet active: real Authentication, server roles and assignment checks, server audit/login logs, protected uploads, App Check, request quotas, backup schedules, restore drills, monitoring and private GitHub configuration. The project has no Firebase configuration or deployment identity. Browser roles/storage/logs remain demonstrations and must not hold real customer data.
+不再提供角色选择预览或读取旧本机客户资料。登入后删除当前域名旧Demo缓存。其他域名尚未访问的浏览器缓存会在其下一次登入时清除；不会自动上传旧资料。
 
-Deployment work: validate Firebase ID tokens and active employee records on each backend request; authorize roles and explicit service-order assignments; validate payloads; record server-generated actor/time and before/after audit in update transactions. Deny all client writes to audit/role/assignment documents. Keep IC/TIN separately authorized, mask list fields, never log tokens/passwords. Protect attachment reads, validate file types/sizes and inspect content; avoid permanent public URLs. Configure App Check and transactional rate limits. Use restricted IAM for backend and encrypted backups. Separate dev/prod, enable dependency/secret scanning, protect GitHub branches, verify restore in a separate test project and route suspicious access alerts to an approved destination.
+数据库已启用防误删、PITR七天版本恢复及每天一次保留七天的备份。恢复演练未完成；不能声称已经验证灾难恢复。Auth账号不包含在Firestore备份中，需另外管理账号生命周期。
 
-User preference: no MFA or additional sensitive-operation approval steps. Normal backend permission checks remain required.
+后台通过 Admin SDK 访问数据库，绕过客户端 Firestore rules；真实数据授权由 functions/policy.js 执行。服务器读取员工文档，前端修改角色不能提升服务器权限。MFA、敏感操作二次确认和附件仍按用户要求不启用。没有系统能保证永不被攻击。
 
-References: https://firebase.google.com/docs/rules/basics ; https://firebase.google.com/docs/auth/admin/custom-claims ; https://firebase.google.com/docs/app-check/cloud-functions
-`n2026-10-06: Web config and project alias maction-crm saved. Separate firebase-login.html uses official SDK for Email/Password authentication with memory-only sessions; it does not open production CRM data or claim audit logging is deployed. No credentials were tested. Official CLI initialization failed due to its downloaded dependency resolution; project admin authorization and rule deployment remain unverified.
-2026-10-06: Firestore deny-all client rules deployed successfully to maction-crm. Anonymous document request must return 403. Storage deployment blocked because Firebase Storage is not provisioned; storage.rules remains local only. This does not implement production roles or protect privileged Admin SDK/IAM access.
-2026-10-06: Storage provisioned by user; deny-all storage.rules deployed successfully to maction-crm. Attachment uploads/downloads remain disabled at user request. No attachments uploaded.
+当前后台运行身份仍是项目默认计算服务账号。用户选择暂时保留现有后台身份，专用身份及最小权限 IAM 切换不执行。GitHub仓库原有可见性及分支保护设置未更改。
+
+每个业务修改的审计含服务器生成的操作人／时间及修改前后资料；因此审计含客户隐私，仅老板／Account可读取。业务转交历史仅老板／Account／获授权经理可读取。上限150条一次提交、40KB每条业务记录，避免异常大请求。
+
+官方依据：[Callable函数认证](https://firebase.google.com/docs/functions/callable)、[App Check](https://firebase.google.com/docs/app-check/cloud-functions)、[Admin SDK与Rules边界](https://firebase.google.com/docs/firestore/security/rules-fields)、[七天恢复](https://firebase.google.com/docs/firestore/use-pitr)、[自动备份](https://firebase.google.com/docs/firestore/backups)。
