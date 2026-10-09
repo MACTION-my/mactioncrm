@@ -13,3 +13,9 @@
 每个业务修改的审计含服务器生成的操作人／时间及修改前后资料；因此审计含客户隐私，仅老板／Account可读取。业务转交历史仅老板／Account／获授权经理可读取。上限150条一次提交、40KB每条业务记录，避免异常大请求。
 
 官方依据：[Callable函数认证](https://firebase.google.com/docs/functions/callable)、[App Check](https://firebase.google.com/docs/app-check/cloud-functions)、[Admin SDK与Rules边界](https://firebase.google.com/docs/firestore/security/rules-fields)、[七天恢复](https://firebase.google.com/docs/firestore/use-pitr)、[自动备份](https://firebase.google.com/docs/firestore/backups)。
+
+## 2026-10-09 再次检查
+
+服务器进一步限制团队转交／自分配操作；服务更新不可改关联学员；学员活动必须匹配购买产品；跟进记录的订单和学员必须对应；角色权限仅接受已知布尔字段；关闭查看权限时服务器不返回对应业务资料。新增回归测试覆盖上述边界。
+
+只读线上检查确认：未认证 callable 请求返回401，防框架/MIME/CSP响应头存在，自助注册关闭、邮箱枚举保护、PITR、防误删、每日七天备份保持启用。本轮没有创建生产测试管理员，没有修改或清空客户资料。灾难恢复演练仍未完成。
