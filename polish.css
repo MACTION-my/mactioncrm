@@ -10,3 +10,6 @@
 
 /* Keep attendance, orders and invitations separate on every screen. */
 .course .meta.event-summary{display:flex;flex-direction:column;align-items:stretch;gap:14px;color:#000}.event-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.event-summary-grid>div{min-width:0}.event-summary-grid strong{display:block;font-size:22px;line-height:1.4;color:#000}.event-summary-grid span{display:block;font-size:15px;line-height:1.5;color:#000}.course .event-roster-warning{margin:0;padding:10px 12px;background:#fff4f4;border-radius:8px;color:#a8071a;font-size:15px;line-height:1.6;overflow-wrap:break-word}.event-summary>.button{align-self:flex-start}@media(max-width:380px){.event-summary-grid{gap:8px}.event-summary-grid strong{font-size:20px}.event-summary-grid span{font-size:14px}}
+
+/* Full-width accessible Firebase login fields on desktop and mobile. */
+#login-preview .login-card{max-width:520px}#firebase-login input{display:block;width:100%;min-width:0;box-sizing:border-box;min-height:54px;padding:14px 16px;border:1px solid #eeb78b;border-radius:8px;background:#fff;color:#000;font-size:18px;line-height:1.4}#firebase-login input:focus{outline:3px solid #ffe19a;outline-offset:2px}@media(max-width:700px){#login-preview .login-card{max-width:none}#firebase-login input{font-size:16px}}
