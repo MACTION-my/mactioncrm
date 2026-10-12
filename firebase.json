@@ -43,6 +43,19 @@
           }
         ]
       }
+    ],
+    "redirects": [
+      {
+        "source": "/firebase-login.html",
+        "destination": "/login",
+        "type": 301
+      }
+    ],
+    "rewrites": [
+      {
+        "source": "/login",
+        "destination": "/login/index.html"
+      }
     ]
   },
   "functions": [

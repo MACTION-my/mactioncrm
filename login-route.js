@@ -1,0 +1,1 @@
+if(location.pathname==='/firebase-login.html'){location.replace('/login')}else if(location.pathname==='/login/'||location.pathname==='/login/index.html'){history.replaceState(null,'','/login'+location.search+location.hash)}
