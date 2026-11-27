@@ -4,7 +4,7 @@
 
 正式版使用 Firebase Authentication、App Check 和新加坡 Cloud Functions。客户与业务资料保存于 Firestore，每次写入由服务器检查员工状态、角色、客户／订单分配及修改前版本；更新与审计在同一事务中提交。浏览器不保存 CRM 业务资料，不迁移旧 Demo 数据。
 
-老板账号：marketing@maction.com.my。老板及 Account 在「权限与分配 → 添加员工」填写姓名、Email、至少12位密码及角色，即可创建 Firebase 登录账号。密码仅传给账号创建接口，不保存于 Firestore、GitHub 或审计日志。公开自助注册已关闭。员工停用会拒绝后台访问并停用 Firebase 账号。
+老板账号：marketing@maction.com.my。老板及 Account 在「权限与分配 → 添加员工」填写姓名、Email、至少6位密码及角色，即可创建 Firebase 登录账号。密码仅传给账号创建接口，不保存于 Firestore、GitHub 或审计日志。公开自助注册已关闭。员工停用会拒绝后台访问并停用 Firebase 账号。
 
 团队只读取已分配的客户／课程订单。服务订单必须明确分配。经理／团队不能登记收款或删除客户；经理可以转交客户，但停用员工账号仅限老板／Account。日志由服务器记录，客户端不能修改。列表、保存状态与每分钟更新读取的是云端资料。
 
